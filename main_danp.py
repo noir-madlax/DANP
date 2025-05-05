@@ -6,7 +6,7 @@ import warnings
 
 
 # just to get rid of numpy array type error
-warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # getting the count of experts
 e_count = ip.exp_count()

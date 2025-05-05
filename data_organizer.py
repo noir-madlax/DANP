@@ -7,7 +7,7 @@ def frame_list(e_count):
     df = [None] * e_count
     i = 1
     while i <= e_count:
-        df[i - 1] = pd.read_excel(r'G:\experts.xlsx', sheet_name=f'expert {i}')
+        df[i - 1] = pd.read_excel(r'experts_sample.xlsx', sheet_name=f'expert {i}')
         i += 1
     return df
 
