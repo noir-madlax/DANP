@@ -1,0 +1,51 @@
+# Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+ENV/
+env/
+.env/
+
+# 项目特定文件
+*.xlsx
+!experts_sample.xlsx
+
+# IDE相关文件
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# MacOS系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# 日志文件
+*.log
+logs/
+
+# 其他临时文件
+temp/
+.temp/
+tmp/
+.tmp/
+
+# 环境变量文件
+.env
+
+# 构建和分发目录
+dist/
+build/
+*.egg-info/
+
+# Jupyter Notebook相关
+.ipynb_checkpoints/
+*.ipynb
+
+# pyenv
+.python-version 
