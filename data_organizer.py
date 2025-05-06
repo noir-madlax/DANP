@@ -1,4 +1,10 @@
-""" This module is written for organizing, listing & fuzzification of data"""
+import pandas as pd
+import os
+import datetime
+
+# 全局变量用于存储当前运行的目录ID
+run_id = None
+
 import pandas as pd
 
 
@@ -86,6 +92,22 @@ def sum_mean(e_count, mylist):
 
 def exl_out(list, name, ind=None, col=None):
     """creating excel output"""
+    global run_id
+    
+    # 创建result目录（如果不存在）
+    if not os.path.exists('result'):
+        os.makedirs('result')
+    
+    # 如果这是第一次调用，创建一个唯一的运行ID
+    if run_id is None:
+        run_id = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        result_dir = os.path.join('result', run_id)
+        os.makedirs(result_dir)
+        print(f"所有结果文件将保存在目录: {result_dir}")
+    else:
+        result_dir = os.path.join('result', run_id)
+    
+    # 创建DataFrame
     if ind is not None and col is not None:
         dff = pd.DataFrame(list, index=ind, columns=col)
     elif ind is not None:
@@ -94,5 +116,7 @@ def exl_out(list, name, ind=None, col=None):
         dff = pd.DataFrame(list, columns=col)
     else:
         dff = pd.DataFrame(list)
-
-    dff.to_excel(f'{name}.xlsx')
+    
+    # 保存到目标目录
+    file_path = os.path.join(result_dir, f'{name}.xlsx')
+    dff.to_excel(file_path)
