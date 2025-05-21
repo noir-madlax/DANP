@@ -10,6 +10,7 @@ env/
 .env/
 
 # 项目特定文件
+./result/
 *.xlsx
 !experts_sample.xlsx
 
