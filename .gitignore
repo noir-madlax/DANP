@@ -50,6 +50,3 @@ build/
 
 # pyenv
 .python-version 
-
-# 结果文件
-result/
