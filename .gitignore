@@ -50,3 +50,6 @@ build/
 
 # pyenv
 .python-version 
+
+# result
+result/
