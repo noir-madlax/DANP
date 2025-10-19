@@ -49,7 +49,7 @@ def create_scatter_plot(result_dir, dr_data, factors, d_plus_r, d_minus_r):
     # 设置标签和标题
     ax.set_xlabel('D+R (中心度/重要性)', fontsize=16, fontweight='bold')
     ax.set_ylabel('D-R (原因度)', fontsize=16, fontweight='bold')
-    ax.set_title('DEMATEL因果分析散点图', fontsize=18, fontweight='bold', pad=25)
+    # ax.set_title('DEMATEL因果分析散点图', fontsize=18, fontweight='bold', pad=25)
     ax.grid(True, alpha=0.4, linestyle='-', linewidth=0.8)
     
     # 添加象限标签
@@ -368,7 +368,7 @@ def main():
     """主函数"""
     
     # 指定目录
-    result_dir = 'result/20250704_121352'
+    result_dir = 'result/20250716_105259'
     
     # 检查目录是否存在
     if not os.path.exists(result_dir):

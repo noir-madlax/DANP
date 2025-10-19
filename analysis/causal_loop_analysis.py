@@ -378,7 +378,7 @@ class CausalLoopAnalyzer:
 def main():
     """主函数"""
     # 数据目录
-    data_dir = "result/20250704_121352"
+    data_dir = "result/20250716_105259"
     
     # 输出目录
     output_dir = os.path.join(data_dir, "causal_loop_analysis")
@@ -397,9 +397,9 @@ def main():
     # 设置阈值（可以尝试不同方法）
     print("\n1. 计算阈值...")
     threshold_methods = [
+        ('percentile', 90),
         ('percentile', 70),
         ('percentile', 60),
-        ('percentile', 80),
         ('mean', None),
         ('median', None)
     ]

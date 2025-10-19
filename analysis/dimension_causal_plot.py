@@ -255,7 +255,7 @@ def main():
     """主函数"""
     
     # 指定目录
-    result_dir = 'result/20250704_121352'
+    result_dir = 'result/20250716_105259'
     
     # 检查目录是否存在
     if not os.path.exists(result_dir):
