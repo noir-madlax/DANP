@@ -15,12 +15,12 @@ import sys
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
-def create_scatter_plot(result_dir, dr_data, factors, d_plus_r, d_minus_r):
+def create_scatter_plot(output_dir, dr_data, factors, d_plus_r, d_minus_r):
     """
     创建DEMATEL因果分析散点图
     """
     print("正在创建因果分析散点图...")
-    
+
     # 创建图形
     fig, ax = plt.subplots(1, 1, figsize=(12, 9))
     
@@ -34,11 +34,11 @@ def create_scatter_plot(result_dir, dr_data, factors, d_plus_r, d_minus_r):
     
     # 添加因素标签
     for i, factor in enumerate(factors):
-        ax.annotate(factor, (d_plus_r[i], d_minus_r[i]), 
+        ax.annotate(factor, (d_plus_r[i], d_minus_r[i]),
                    xytext=(10, 10), textcoords='offset points',
-                   fontsize=12, ha='left', va='bottom',
+                   fontsize=16, ha='left', va='bottom',
                    fontweight='bold',
-                   bbox=dict(boxstyle="round,pad=0.4", 
+                   bbox=dict(boxstyle="round,pad=0.4",
                             facecolor='white', alpha=0.9,
                             edgecolor='gray'))
     
@@ -47,66 +47,69 @@ def create_scatter_plot(result_dir, dr_data, factors, d_plus_r, d_minus_r):
     ax.axvline(x=np.mean(d_plus_r), color='red', linestyle='--', alpha=0.8, linewidth=3)
     
     # 设置标签和标题
-    ax.set_xlabel('D+R (中心度/重要性)', fontsize=16, fontweight='bold')
-    ax.set_ylabel('D-R (原因度)', fontsize=16, fontweight='bold')
+    ax.set_xlabel('中心度（D + R）', fontsize=20, fontweight='bold')
+    ax.set_ylabel('原因度（D - R）', fontsize=20, fontweight='bold')
     # ax.set_title('DEMATEL因果分析散点图', fontsize=18, fontweight='bold', pad=25)
     ax.grid(True, alpha=0.4, linestyle='-', linewidth=0.8)
-    
+
     # 添加象限标签
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
-    
+
     # 调整象限标签位置
-    ax.text(xlim[1]*0.82, ylim[1]*0.82, 
+    ax.text(xlim[1]*0.85, ylim[1]*0.85,
              '高重要性\n原因因素\n(关键驱动)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.6", facecolor="lightcoral", alpha=0.9,
                       edgecolor='darkred', linewidth=2),
-             fontsize=11, fontweight='bold')
-    
-    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.18, ylim[1]*0.82, 
+             fontsize=18, fontweight='bold')
+
+    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.12, ylim[1]*0.88,
              '低重要性\n原因因素\n(次要驱动)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.6", facecolor="lightgreen", alpha=0.9,
                       edgecolor='darkgreen', linewidth=2),
-             fontsize=11, fontweight='bold')
-    
-    ax.text(xlim[1]*0.82, ylim[0] + (ylim[1]-ylim[0])*0.18, 
+             fontsize=18, fontweight='bold')
+
+    ax.text(xlim[1]*0.85, ylim[0] + (ylim[1]-ylim[0])*0.15,
              '高重要性\n结果因素\n(关键目标)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.6", facecolor="lightyellow", alpha=0.9,
                       edgecolor='orange', linewidth=2),
-             fontsize=11, fontweight='bold')
-    
-    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.18, ylim[0] + (ylim[1]-ylim[0])*0.18, 
+             fontsize=18, fontweight='bold')
+
+    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.12, ylim[0] + (ylim[1]-ylim[0])*0.12,
              '低重要性\n结果因素\n(次要目标)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.6", facecolor="lightblue", alpha=0.9,
                       edgecolor='darkblue', linewidth=2),
-             fontsize=11, fontweight='bold')
-    
-    # 添加数值标注
-    ax.text(xlim[1]*0.95, ylim[1]*0.95, 
-            f'D+R范围: {d_plus_r.min():.2f}~{d_plus_r.max():.2f}\nD-R范围: {d_minus_r.min():.2f}~{d_minus_r.max():.2f}',
-            ha='right', va='top', fontsize=10,
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))
+             fontsize=18, fontweight='bold')
     
     # 调整坐标轴
-    ax.tick_params(axis='both', which='major', labelsize=12)
-    
+    ax.tick_params(axis='both', which='major', labelsize=14)
+
+    # 设置坐标轴为整数刻度
+    # X轴设置为0-9的整数
+    ax.set_xlim(0, 9)
+    ax.set_xticks(range(0, 10, 1))
+
+    # Y轴设置为-2到2，刻度为0.5一档
+    ax.set_ylim(-2, 2)
+    ax.set_yticks(np.arange(-2, 2.5, 0.5))
+
     # 保存散点图
-    scatter_file = os.path.join(result_dir, 'dematel_scatter_plot.png')
+    scatter_file = os.path.join(output_dir, 'dematel_scatter_plot.png')
     plt.tight_layout()
     plt.savefig(scatter_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"散点图已保存到: {scatter_file}")
-    
+
     plt.show()
     plt.close()
-    
+
     return scatter_file
 
-def create_network_plot(result_dir, tc_data, factors, d_plus_r, d_minus_r, threshold=0.1):
+def create_network_plot(output_dir, tc_data, factors, d_plus_r, d_minus_r, threshold=0.1):
     """
     创建DEMATEL网络因果图
     """
     print("正在创建网络因果图...")
-    
+
     # 创建图形
     fig, ax = plt.subplots(1, 1, figsize=(14, 10))
     
@@ -195,19 +198,19 @@ def create_network_plot(result_dir, tc_data, factors, d_plus_r, d_minus_r, thres
     for factor in factors:
         idx = factors.index(factor)
         labels[factor] = f"{factor}\n({d_plus_r[idx]:.2f})"
-    
-    nx.draw_networkx_labels(G, pos, labels, ax=ax, font_size=10, font_weight='bold')
-    
+
+    nx.draw_networkx_labels(G, pos, labels, ax=ax, font_size=16, font_weight='bold')
+
     # 设置标题
-    ax.set_title('DEMATEL网络因果图', fontsize=18, fontweight='bold', pad=25)
+    ax.set_title('DEMATEL网络因果图', fontsize=20, fontweight='bold', pad=25)
     ax.axis('off')
-    
+
     # 添加详细图例
     legend_elements = [
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='lightcoral', 
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='lightcoral',
                    markersize=15, label='原因因素 (D-R > 0)', markeredgecolor='black',
                    markeredgewidth=2),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='lightblue', 
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='lightblue',
                    markersize=15, label='结果因素 (D-R ≤ 0)', markeredgecolor='black',
                    markeredgewidth=2),
         plt.Line2D([0], [0], color='gray', linewidth=4, alpha=0.7,
@@ -215,39 +218,45 @@ def create_network_plot(result_dir, tc_data, factors, d_plus_r, d_minus_r, thres
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='white',
                    markersize=12, label='节点大小 ∝ 重要性(D+R)', markeredgecolor='black')
     ]
-    
-    ax.legend(handles=legend_elements, loc='upper right', fontsize=12, 
+
+    ax.legend(handles=legend_elements, loc='upper right', fontsize=18,
              frameon=True, fancybox=True, shadow=True)
-    
+
     # 添加统计信息
     stats_text = f"""网络统计:
 节点数: {len(factors)}
 边数: {len(G.edges())}
 原因因素: {len([f for f in factors if d_minus_r[factors.index(f)] > 0])}个
 结果因素: {len([f for f in factors if d_minus_r[factors.index(f)] <= 0])}个"""
-    
-    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, fontsize=10,
-           verticalalignment='top', bbox=dict(boxstyle="round,pad=0.5", 
+
+    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, fontsize=18,
+           verticalalignment='top', bbox=dict(boxstyle="round,pad=0.5",
                                             facecolor="white", alpha=0.8))
     
     # 保存网络图
-    network_file = os.path.join(result_dir, 'dematel_network_plot.png')
+    network_file = os.path.join(output_dir, 'dematel_network_plot.png')
     plt.tight_layout()
     plt.savefig(network_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"网络图已保存到: {network_file}")
-    
+
     plt.show()
     plt.close()
-    
+
     return network_file
 
 def create_separate_diagrams(result_dir, threshold=0.1):
     """
     创建分离的DEMATEL因果图
     """
-    
+
     print(f"正在处理目录: {result_dir}")
-    
+
+    # 创建输出文件夹
+    output_dir = os.path.join(result_dir, 'dematel_visualization_separate')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"已创建输出文件夹: {output_dir}")
+
     # 文件路径
     dr_file = os.path.join(result_dir, 'D_R.xlsx')
     tc_file = os.path.join(result_dir, 'Tc_defuzzied.xlsx')
@@ -271,8 +280,8 @@ def create_separate_diagrams(result_dir, threshold=0.1):
         tc_data = pd.read_excel(tc_file, index_col=0)
         print(f"Tc数据形状: {tc_data.shape}")
         
-        # 获取因素名称
-        factors = dr_data.index.tolist()
+        # 获取因素名称并将c改为C
+        factors = [f.replace('c', 'C') if 'c' in f else f for f in dr_data.index.tolist()]
         print(f"因素列表: {factors}")
         
         # 提取D+R和D-R数据
@@ -288,11 +297,11 @@ def create_separate_diagrams(result_dir, threshold=0.1):
     
     # 分别创建两个图
     print("\n" + "="*60)
-    scatter_file = create_scatter_plot(result_dir, dr_data, factors, d_plus_r, d_minus_r)
-    
-    print("\n" + "="*60)  
-    network_file = create_network_plot(result_dir, tc_data, factors, d_plus_r, d_minus_r, threshold)
-    
+    scatter_file = create_scatter_plot(output_dir, dr_data, factors, d_plus_r, d_minus_r)
+
+    print("\n" + "="*60)
+    network_file = create_network_plot(output_dir, tc_data, factors, d_plus_r, d_minus_r, threshold)
+
     return scatter_file, network_file
 
 def analyze_causal_relationships(result_dir):
@@ -368,7 +377,7 @@ def main():
     """主函数"""
     
     # 指定目录
-    result_dir = 'result/20250716_105259'
+    result_dir = 'result/20251026_175633'
     
     # 检查目录是否存在
     if not os.path.exists(result_dir):
@@ -390,7 +399,7 @@ def main():
         # 分析因果关系
         analyze_causal_relationships(result_dir)
         
-        print(f"\n✅ 所有文件已生成到目录: {result_dir}")
+        print(f"\n✅ 所有文件已生成到目录: {os.path.join(result_dir, 'dematel_visualization_separate')}")
     else:
         print("因果图创建失败!")
 
