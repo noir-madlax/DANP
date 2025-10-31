@@ -236,14 +236,14 @@ class CausalLoopAnalyzer:
         if self.strong_relation_matrix is None:
             print("错误: 请先构建强关联矩阵!")
             return
-        
-        # 创建图形 - 调整宽度以容纳右侧信息
-        fig, ax = plt.subplots(1, 1, figsize=(16, 10))
-        
+
+        # 创建图形 - 调整为正方形
+        fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+
         # === 强关联矩阵热力图 ===
         # 使用专业的学术配色方案
-        sns.heatmap(self.strong_relation_matrix.astype(int), 
-                   annot=True, 
+        sns.heatmap(self.strong_relation_matrix.astype(int),
+                   annot=True,
                    cmap='Blues',  # 使用蓝色系，更适合学术论文
                    center=0,
                    fmt='d',
@@ -252,70 +252,82 @@ class CausalLoopAnalyzer:
                    annot_kws={'fontsize': 16, 'fontweight': 'bold'},  # 增大矩阵数字字体
                    linewidths=0.5,  # 添加网格线
                    linecolor='white')  # 网格线颜色
-        
-        ax.set_title(f'强关联矩阵与互为强因果关系 (阈值λ={self.threshold:.4f})', 
-                    fontsize=20, fontweight='bold', pad=20)  # 增大标题字体
-        ax.set_xlabel('影响的因素', fontsize=18, fontweight='bold')  # 增大轴标签字体
-        ax.set_ylabel('被影响的因素', fontsize=18, fontweight='bold')  # 增大轴标签字体
-        
+
+        # 不设置标题
+        ax.set_xlabel('影响的因素', fontsize=20, fontweight='bold')  # 增大轴标签字体
+        ax.set_ylabel('被影响的因素', fontsize=20, fontweight='bold')  # 增大轴标签字体
+
         # 调整刻度标签
         ax.tick_params(axis='both', which='major', labelsize=15)  # 增大刻度标签字体
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
         ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
-        
+
         # === 在热力图上标注互为强因果关系的连线 ===
         # 识别互为强因果关系的因素对
         mutual_relations = []
         for i in range(len(self.factors)):
             for j in range(i+1, len(self.factors)):  # 避免重复检查
-                if (self.strong_relation_matrix.iloc[i, j] == 1 and 
+                if (self.strong_relation_matrix.iloc[i, j] == 1 and
                     self.strong_relation_matrix.iloc[j, i] == 1):
                     mutual_relations.append((i, j, self.factors[i], self.factors[j]))
-        
+
         # 在热力图上画箭头表示互为强因果关系
-        for i, j, factor_i, factor_j in mutual_relations:
+        for i, j, _, _ in mutual_relations:
             # 计算格子中心坐标
             x1, y1 = j + 0.5, i + 0.5  # (i,j)格子中心
             x2, y2 = i + 0.5, j + 0.5  # (j,i)格子中心
-            
+
             # 画双向箭头 - 使用更专业的颜色
             ax.annotate('', xy=(x2, y2), xytext=(x1, y1),
                        arrowprops=dict(arrowstyle='<->', color='darkred', lw=3, alpha=0.9))
-            
+
             # 在连线中点添加标签
             mid_x, mid_y = (x1 + x2) / 2, (y1 + y2) / 2
-            ax.text(mid_x, mid_y, '↔', ha='center', va='center', 
+            ax.text(mid_x, mid_y, '↔', ha='center', va='center',
                    fontsize=18, fontweight='bold', color='darkred',  # 增大箭头字体
                    bbox=dict(boxstyle="round,pad=0.3", facecolor='white', alpha=0.9, edgecolor='darkred'))
-        
-        # 添加图例说明 - 调整样式
-        legend_elements = [
-            plt.Line2D([0], [0], color='darkred', lw=3, alpha=0.9, 
-                      label=f'互为强因果关系 ({len(mutual_relations)}对)')
-        ]
-        ax.legend(handles=legend_elements, loc='upper left', bbox_to_anchor=(1.01, 1),
-                 frameon=True, fancybox=True, shadow=True, fontsize=16)  # 增大图例字体
-        
-        # 在图上添加互为强因果关系的详细信息 - 调整样式
-        info_text = "互为强因果关系的因素对:\n\n"
-        for _, _, factor_i, factor_j in mutual_relations:
-            info_text += f"• {factor_i} ↔ {factor_j}\n"
-        
-        # 在图的右侧添加信息框 - 调整位置和大小
-        ax.text(1.02, 0.5, info_text, transform=ax.transAxes, fontsize=16,  # 增大信息框字体
-               verticalalignment='center', fontweight='normal',
-               bbox=dict(boxstyle="round,pad=0.8", facecolor='lightgray', alpha=0.9, 
-                        edgecolor='gray', linewidth=1))
-        
-        # 调整布局以确保右侧信息完全显示
-        plt.subplots_adjust(right=0.7)  # 为右侧信息预留30%的空间
-        
+
+        # === 在图的底部添加说明信息 ===
+        # 左下角：红线图示 + 说明
+        # 绘制红色双向箭头图示
+        arrow_y = 0.04  # 箭头的垂直位置
+        arrow_start_x = 0.12  # 箭头起始位置
+        arrow_end_x = 0.17  # 箭头结束位置
+
+        # 使用annotate绘制双向箭头
+        fig.add_artist(plt.Line2D([arrow_start_x, arrow_end_x], [arrow_y, arrow_y],
+                                  transform=fig.transFigure,
+                                  color='darkred', linewidth=3, alpha=0.9))
+        # 添加箭头头部
+        # fig.add_artist(plt.annotate('', xy=(arrow_end_x, arrow_y), xytext=(arrow_start_x, arrow_y),
+        #                            xycoords='figure fraction', textcoords='figure fraction',
+        #                            arrowprops=dict(arrowstyle='<->', color='darkred', lw=3, alpha=0.9)))
+
+        # 红线说明文字
+        left_text = f'表示互为强因果关系 ({len(mutual_relations)}对)'
+        fig.text(0.18, arrow_y, left_text,
+                ha='left', va='center',
+                fontsize=18,
+                fontweight='normal',
+                transform=fig.transFigure)
+
+        # 右下角：阈值说明
+        right_text = f'阈值λ = {self.threshold:.4f}'
+        fig.text(0.8, arrow_y, right_text,
+                ha='right', va='center',
+                fontsize=18,
+                fontweight='normal',
+                transform=fig.transFigure)
+
+        # 调整布局以确保底部说明完全显示，并与X轴标签分开
+        plt.subplots_adjust(bottom=0.12)  # 为底部说明预留更多空间
+
         if save_path:
             # 确保输出目录存在
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"因果网络图已保存至: {save_path}")
-        
+
         plt.show()
     
     def save_results(self, output_dir):
@@ -378,7 +390,7 @@ class CausalLoopAnalyzer:
 def main():
     """主函数"""
     # 数据目录
-    data_dir = "result/20250716_105259"
+    data_dir = "result/20251026_175633"
     
     # 输出目录
     output_dir = os.path.join(data_dir, "causal_loop_analysis")
