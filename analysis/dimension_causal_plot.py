@@ -138,8 +138,14 @@ D-R范围: {d_minus_r.min():.2f} ~ {d_minus_r.max():.2f}
     # 调整坐标轴
     ax.tick_params(axis='both', which='major', labelsize=14)
     
+    # 创建输出目录
+    output_dir = os.path.join(result_dir, 'dimension_analysis')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"创建输出目录: {output_dir}")
+
     # 保存散点图
-    scatter_file = os.path.join(result_dir, 'dimension_scatter_plot.png')
+    scatter_file = os.path.join(output_dir, 'dimension_scatter_plot.png')
     plt.tight_layout()
     plt.savefig(scatter_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"维度散点图已保存到: {scatter_file}")
@@ -226,7 +232,11 @@ def analyze_dimension_relationships(result_dir, td_dr_data):
             print(f"      → 这些维度是系统的关键输出指标")
         
         # 保存维度分析报告
-        report_file = os.path.join(result_dir, 'dimension_causal_analysis_report.txt')
+        output_dir = os.path.join(result_dir, 'dimension_analysis')
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            
+        report_file = os.path.join(output_dir, 'dimension_causal_analysis_report.txt')
         with open(report_file, 'w', encoding='utf-8') as f:
             f.write("DEMATEL维度级因果关系分析报告\n")
             f.write("="*60 + "\n\n")
@@ -255,7 +265,7 @@ def main():
     """主函数"""
     
     # 指定目录
-    result_dir = 'result/20250716_105259'
+    result_dir = 'result/20251026_175633'
     
     # 检查目录是否存在
     if not os.path.exists(result_dir):
