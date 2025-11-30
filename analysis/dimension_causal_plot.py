@@ -35,8 +35,8 @@ def create_dimension_scatter_plot(result_dir):
         print(f"维度D_R数据形状: {td_dr_data.shape}")
         print(f"维度D_R数据列名: {list(td_dr_data.columns)}")
         
-        # 获取维度名称
-        dimensions = td_dr_data.index.tolist()
+        # 获取维度名称并转换为大写C
+        dimensions = [dim.replace('d', 'C') for dim in td_dr_data.index.tolist()]
         print(f"维度列表: {dimensions}")
         
         # 提取D+R和D-R数据
@@ -68,7 +68,7 @@ def create_dimension_scatter_plot(result_dir):
     for i, dimension in enumerate(dimensions):
         ax.annotate(dimension, (d_plus_r[i], d_minus_r[i]), 
                    xytext=(15, 15), textcoords='offset points',
-                   fontsize=16, ha='left', va='bottom',
+                   fontsize=20, ha='left', va='bottom',
                    fontweight='bold',
                    bbox=dict(boxstyle="round,pad=0.5", 
                             facecolor='white', alpha=0.9,
@@ -78,65 +78,60 @@ def create_dimension_scatter_plot(result_dir):
     ax.axhline(y=0, color='red', linestyle='--', alpha=0.8, linewidth=3)
     ax.axvline(x=np.mean(d_plus_r), color='red', linestyle='--', alpha=0.8, linewidth=3)
     
-    # 设置标签和标题
-    ax.set_xlabel('D+R (中心度/重要性)', fontsize=18, fontweight='bold')
-    ax.set_ylabel('D-R (原因度)', fontsize=18, fontweight='bold')
-    ax.set_title('DEMATEL维度级因果分析散点图', fontsize=20, fontweight='bold', pad=30)
+    # 设置标签
+    ax.set_xlabel('中心度（D + R）', fontsize=20, fontweight='bold')
+    ax.set_ylabel('原因度（D - R）', fontsize=20, fontweight='bold')
     ax.grid(True, alpha=0.4, linestyle='-', linewidth=1)
     
-    # 添加象限标签
+    # 添加象限标签 - 放置在每个象限的中心
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
     
-    # 调整象限标签位置和样式
-    ax.text(xlim[1]*0.85, ylim[1]*0.85, 
+    # 计算参考线位置
+    x_mid = np.mean(d_plus_r)
+    y_mid = 0
+    
+    # 右上象限 - 高重要性原因维度
+    x_right_center = (x_mid + xlim[1]) / 2
+    y_top_center = (y_mid + ylim[1]) / 2
+    ax.text(x_right_center, y_top_center, 
              '高重要性\n原因维度\n(核心驱动)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.8", facecolor="lightcoral", alpha=0.9,
                       edgecolor='darkred', linewidth=3),
-             fontsize=13, fontweight='bold')
+             fontsize=20, fontweight='bold')
     
-    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.15, ylim[1]*0.85, 
+    # 左上象限 - 低重要性原因维度
+    x_left_center = (xlim[0] + x_mid) / 2
+    ax.text(x_left_center, y_top_center, 
              '低重要性\n原因维度\n(辅助驱动)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.8", facecolor="lightgreen", alpha=0.9,
                       edgecolor='darkgreen', linewidth=3),
-             fontsize=13, fontweight='bold')
+             fontsize=20, fontweight='bold')
     
-    ax.text(xlim[1]*0.85, ylim[0] + (ylim[1]-ylim[0])*0.15, 
+    # 右下象限 - 高重要性结果维度
+    y_bottom_center = (ylim[0] + y_mid) / 2
+    ax.text(x_right_center, y_bottom_center, 
              '高重要性\n结果维度\n(关键输出)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.8", facecolor="lightyellow", alpha=0.9,
                       edgecolor='orange', linewidth=3),
-             fontsize=13, fontweight='bold')
+             fontsize=20, fontweight='bold')
     
-    ax.text(xlim[0] + (xlim[1]-xlim[0])*0.15, ylim[0] + (ylim[1]-ylim[0])*0.15, 
+    # 左下象限 - 低重要性结果维度
+    ax.text(x_left_center, y_bottom_center, 
              '低重要性\n结果维度\n(次要输出)', ha='center', va='center',
              bbox=dict(boxstyle="round,pad=0.8", facecolor="lightblue", alpha=0.9,
                       edgecolor='darkblue', linewidth=3),
-             fontsize=13, fontweight='bold')
+             fontsize=20, fontweight='bold')
     
-    # 添加数值标注框
-    stats_text = f"""维度统计信息:
-D+R范围: {d_plus_r.min():.2f} ~ {d_plus_r.max():.2f}
-D-R范围: {d_minus_r.min():.2f} ~ {d_minus_r.max():.2f}
-维度总数: {len(dimensions)}个
-原因维度: {len([d for d in d_minus_r if d > 0])}个
-结果维度: {len([d for d in d_minus_r if d <= 0])}个"""
-    
-    ax.text(xlim[1]*0.98, ylim[1]*0.98, stats_text,
-            ha='right', va='top', fontsize=11,
-            bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.9,
-                     edgecolor='gray', linewidth=1))
-    
-    # 为每个维度添加数值标注
-    for i, dimension in enumerate(dimensions):
-        value_text = f"D+R={d_plus_r[i]:.2f}\nD-R={d_minus_r[i]:.2f}"
-        ax.annotate(value_text, (d_plus_r[i], d_minus_r[i]), 
-                   xytext=(15, -25), textcoords='offset points',
-                   fontsize=10, ha='left', va='top',
-                   bbox=dict(boxstyle="round,pad=0.3", 
-                            facecolor=dimension_colors[i], alpha=0.7))
+
+
     
     # 调整坐标轴
-    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    
+    # 设置坐标轴范围
+    ax.set_ylim(-0.20, 0.20)
+    ax.set_xlim(0.4, 1.4)
     
     # 创建输出目录
     output_dir = os.path.join(result_dir, 'dimension_analysis')
@@ -150,7 +145,6 @@ D-R范围: {d_minus_r.min():.2f} ~ {d_minus_r.max():.2f}
     plt.savefig(scatter_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"维度散点图已保存到: {scatter_file}")
     
-    plt.show()
     plt.close()
     
     return scatter_file, td_dr_data
